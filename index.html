@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Visualizations</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        h1 { text-align: center; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        .toc {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .toc h2 { margin-top: 0; }
+        .toc-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .toc-item {
+            background: #e8e8e8;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+        }
+        .toc-item:hover { background: #d0d0d0; }
+        .toc-item .count { color: #888; font-size: 12px; }
+        .size-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .size-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .size-header h2 { margin: 0; }
+        .size-header .count { color: #888; }
+        .back-to-top {
+            font-size: 14px;
+            color: #666;
+            text-decoration: none;
+        }
+        .back-to-top:hover { color: #333; }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .image-card {
+            background: #fafafa;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+        .image-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+        }
+        .image-card img:hover { opacity: 0.9; }
+        .image-card .label {
+            padding: 5px;
+            font-size: 12px;
+            text-align: center;
+            color: #666;
+            background: #f0f0f0;
+        }
+        /* Modal for enlarged view */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active { display: flex; }
+        .modal img {
+            max-width: 90%;
+            max-height: 90%;
+            image-rendering: pixelated;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Model Visualizations</h1>
+    <p class="subtitle">425 models across 37 sizes</p>
+
+    <nav class="toc" id="top">
+        <h2>Sizes</h2>
+        <div class="toc-grid">
+            <a href="#size-0" class="toc-item">0 <span class="count">(1)</span></a>
+            <a href="#size-1" class="toc-item">1 <span class="count">(1)</span></a>
+            <a href="#size-5" class="toc-item">5 <span class="count">(1)</span></a>
+            <a href="#size-7" class="toc-item">7 <span class="count">(2)</span></a>
+            <a href="#size-9" class="toc-item">9 <span class="count">(1)</span></a>
+            <a href="#size-11" class="toc-item">11 <span class="count">(4)</span></a>
+            <a href="#size-13" class="toc-item">13 <span class="count">(1)</span></a>
+            <a href="#size-16" class="toc-item">16 <span class="count">(2)</span></a>
+            <a href="#size-19" class="toc-item">19 <span class="count">(2)</span></a>
+            <a href="#size-21" class="toc-item">21 <span class="count">(4)</span></a>
+            <a href="#size-25" class="toc-item">25 <span class="count">(48)</span></a>
+            <a href="#size-29" class="toc-item">29 <span class="count">(1)</span></a>
+            <a href="#size-31" class="toc-item">31 <span class="count">(6)</span></a>
+            <a href="#size-35" class="toc-item">35 <span class="count">(26)</span></a>
+            <a href="#size-37" class="toc-item">37 <span class="count">(2)</span></a>
+            <a href="#size-41" class="toc-item">41 <span class="count">(12)</span></a>
+            <a href="#size-43" class="toc-item">43 <span class="count">(4)</span></a>
+            <a href="#size-45" class="toc-item">45 <span class="count">(5)</span></a>
+            <a href="#size-49" class="toc-item">49 <span class="count">(30)</span></a>
+            <a href="#size-55" class="toc-item">55 <span class="count">(16)</span></a>
+            <a href="#size-61" class="toc-item">61 <span class="count">(35)</span></a>
+            <a href="#size-63" class="toc-item">63 <span class="count">(10)</span></a>
+            <a href="#size-65" class="toc-item">65 <span class="count">(17)</span></a>
+            <a href="#size-67" class="toc-item">67 <span class="count">(2)</span></a>
+            <a href="#size-71" class="toc-item">71 <span class="count">(4)</span></a>
+            <a href="#size-73" class="toc-item">73 <span class="count">(2)</span></a>
+            <a href="#size-77" class="toc-item">77 <span class="count">(87)</span></a>
+            <a href="#size-80" class="toc-item">80 <span class="count">(4)</span></a>
+            <a href="#size-81" class="toc-item">81 <span class="count">(21)</span></a>
+            <a href="#size-83" class="toc-item">83 <span class="count">(1)</span></a>
+            <a href="#size-85" class="toc-item">85 <span class="count">(7)</span></a>
+            <a href="#size-89" class="toc-item">89 <span class="count">(1)</span></a>
+            <a href="#size-91" class="toc-item">91 <span class="count">(10)</span></a>
+            <a href="#size-95" class="toc-item">95 <span class="count">(6)</span></a>
+            <a href="#size-97" class="toc-item">97 <span class="count">(2)</span></a>
+            <a href="#size-99" class="toc-item">99 <span class="count">(46)</span></a>
+            <a href="#size-496" class="toc-item">496 <span class="count">(1)</span></a>
+        </div>
+    </nav>
+
+    <section class="size-section" id="size-0">
+        <div class="size-header">
+            <h2>Size 0</h2>
+            <span class="count">1 model</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/0_0.png" onclick="openModal(this)"><div class="label">0_0</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-1">
+        <div class="size-header">
+            <h2>Size 1</h2>
+            <span class="count">1 model</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/1_0.png" onclick="openModal(this)"><div class="label">1_0</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-5">
+        <div class="size-header">
+            <h2>Size 5</h2>
+            <span class="count">1 model</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/5_0.png" onclick="openModal(this)"><div class="label">5_0</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-7">
+        <div class="size-header">
+            <h2>Size 7</h2>
+            <span class="count">2 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/7_0.png" onclick="openModal(this)"><div class="label">7_0</div></div>
+            <div class="image-card"><img src="visualizations/7_1.png" onclick="openModal(this)"><div class="label">7_1</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-9">
+        <div class="size-header">
+            <h2>Size 9</h2>
+            <span class="count">1 model</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/9_0.png" onclick="openModal(this)"><div class="label">9_0</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-11">
+        <div class="size-header">
+            <h2>Size 11</h2>
+            <span class="count">4 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/11_0.png" onclick="openModal(this)"><div class="label">11_0</div></div>
+            <div class="image-card"><img src="visualizations/11_1.png" onclick="openModal(this)"><div class="label">11_1</div></div>
+            <div class="image-card"><img src="visualizations/11_2.png" onclick="openModal(this)"><div class="label">11_2</div></div>
+            <div class="image-card"><img src="visualizations/11_3.png" onclick="openModal(this)"><div class="label">11_3</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-13">
+        <div class="size-header">
+            <h2>Size 13</h2>
+            <span class="count">1 model</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/13_0.png" onclick="openModal(this)"><div class="label">13_0</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-16">
+        <div class="size-header">
+            <h2>Size 16</h2>
+            <span class="count">2 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/16_0.png" onclick="openModal(this)"><div class="label">16_0</div></div>
+            <div class="image-card"><img src="visualizations/16_1.png" onclick="openModal(this)"><div class="label">16_1</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-19">
+        <div class="size-header">
+            <h2>Size 19</h2>
+            <span class="count">2 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/19_0.png" onclick="openModal(this)"><div class="label">19_0</div></div>
+            <div class="image-card"><img src="visualizations/19_1.png" onclick="openModal(this)"><div class="label">19_1</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-21">
+        <div class="size-header">
+            <h2>Size 21</h2>
+            <span class="count">4 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/21_0.png" onclick="openModal(this)"><div class="label">21_0</div></div>
+            <div class="image-card"><img src="visualizations/21_1.png" onclick="openModal(this)"><div class="label">21_1</div></div>
+            <div class="image-card"><img src="visualizations/21_2.png" onclick="openModal(this)"><div class="label">21_2</div></div>
+            <div class="image-card"><img src="visualizations/21_3.png" onclick="openModal(this)"><div class="label">21_3</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-25">
+        <div class="size-header">
+            <h2>Size 25</h2>
+            <span class="count">48 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/25_0.png" onclick="openModal(this)"><div class="label">25_0</div></div>
+            <div class="image-card"><img src="visualizations/25_1.png" onclick="openModal(this)"><div class="label">25_1</div></div>
+            <div class="image-card"><img src="visualizations/25_2.png" onclick="openModal(this)"><div class="label">25_2</div></div>
+            <div class="image-card"><img src="visualizations/25_3.png" onclick="openModal(this)"><div class="label">25_3</div></div>
+            <div class="image-card"><img src="visualizations/25_4.png" onclick="openModal(this)"><div class="label">25_4</div></div>
+            <div class="image-card"><img src="visualizations/25_5.png" onclick="openModal(this)"><div class="label">25_5</div></div>
+            <div class="image-card"><img src="visualizations/25_6.png" onclick="openModal(this)"><div class="label">25_6</div></div>
+            <div class="image-card"><img src="visualizations/25_7.png" onclick="openModal(this)"><div class="label">25_7</div></div>
+            <div class="image-card"><img src="visualizations/25_8.png" onclick="openModal(this)"><div class="label">25_8</div></div>
+            <div class="image-card"><img src="visualizations/25_9.png" onclick="openModal(this)"><div class="label">25_9</div></div>
+            <div class="image-card"><img src="visualizations/25_10.png" onclick="openModal(this)"><div class="label">25_10</div></div>
+            <div class="image-card"><img src="visualizations/25_11.png" onclick="openModal(this)"><div class="label">25_11</div></div>
+            <div class="image-card"><img src="visualizations/25_12.png" onclick="openModal(this)"><div class="label">25_12</div></div>
+            <div class="image-card"><img src="visualizations/25_13.png" onclick="openModal(this)"><div class="label">25_13</div></div>
+            <div class="image-card"><img src="visualizations/25_14.png" onclick="openModal(this)"><div class="label">25_14</div></div>
+            <div class="image-card"><img src="visualizations/25_15.png" onclick="openModal(this)"><div class="label">25_15</div></div>
+            <div class="image-card"><img src="visualizations/25_16.png" onclick="openModal(this)"><div class="label">25_16</div></div>
+            <div class="image-card"><img src="visualizations/25_17.png" onclick="openModal(this)"><div class="label">25_17</div></div>
+            <div class="image-card"><img src="visualizations/25_18.png" onclick="openModal(this)"><div class="label">25_18</div></div>
+            <div class="image-card"><img src="visualizations/25_19.png" onclick="openModal(this)"><div class="label">25_19</div></div>
+            <div class="image-card"><img src="visualizations/25_20.png" onclick="openModal(this)"><div class="label">25_20</div></div>
+            <div class="image-card"><img src="visualizations/25_21.png" onclick="openModal(this)"><div class="label">25_21</div></div>
+            <div class="image-card"><img src="visualizations/25_22.png" onclick="openModal(this)"><div class="label">25_22</div></div>
+            <div class="image-card"><img src="visualizations/25_23.png" onclick="openModal(this)"><div class="label">25_23</div></div>
+            <div class="image-card"><img src="visualizations/25_24.png" onclick="openModal(this)"><div class="label">25_24</div></div>
+            <div class="image-card"><img src="visualizations/25_25.png" onclick="openModal(this)"><div class="label">25_25</div></div>
+            <div class="image-card"><img src="visualizations/25_26.png" onclick="openModal(this)"><div class="label">25_26</div></div>
+            <div class="image-card"><img src="visualizations/25_27.png" onclick="openModal(this)"><div class="label">25_27</div></div>
+            <div class="image-card"><img src="visualizations/25_28.png" onclick="openModal(this)"><div class="label">25_28</div></div>
+            <div class="image-card"><img src="visualizations/25_29.png" onclick="openModal(this)"><div class="label">25_29</div></div>
+            <div class="image-card"><img src="visualizations/25_30.png" onclick="openModal(this)"><div class="label">25_30</div></div>
+            <div class="image-card"><img src="visualizations/25_31.png" onclick="openModal(this)"><div class="label">25_31</div></div>
+            <div class="image-card"><img src="visualizations/25_32.png" onclick="openModal(this)"><div class="label">25_32</div></div>
+            <div class="image-card"><img src="visualizations/25_33.png" onclick="openModal(this)"><div class="label">25_33</div></div>
+            <div class="image-card"><img src="visualizations/25_34.png" onclick="openModal(this)"><div class="label">25_34</div></div>
+            <div class="image-card"><img src="visualizations/25_35.png" onclick="openModal(this)"><div class="label">25_35</div></div>
+            <div class="image-card"><img src="visualizations/25_36.png" onclick="openModal(this)"><div class="label">25_36</div></div>
+            <div class="image-card"><img src="visualizations/25_37.png" onclick="openModal(this)"><div class="label">25_37</div></div>
+            <div class="image-card"><img src="visualizations/25_38.png" onclick="openModal(this)"><div class="label">25_38</div></div>
+            <div class="image-card"><img src="visualizations/25_39.png" onclick="openModal(this)"><div class="label">25_39</div></div>
+            <div class="image-card"><img src="visualizations/25_40.png" onclick="openModal(this)"><div class="label">25_40</div></div>
+            <div class="image-card"><img src="visualizations/25_41.png" onclick="openModal(this)"><div class="label">25_41</div></div>
+            <div class="image-card"><img src="visualizations/25_42.png" onclick="openModal(this)"><div class="label">25_42</div></div>
+            <div class="image-card"><img src="visualizations/25_43.png" onclick="openModal(this)"><div class="label">25_43</div></div>
+            <div class="image-card"><img src="visualizations/25_44.png" onclick="openModal(this)"><div class="label">25_44</div></div>
+            <div class="image-card"><img src="visualizations/25_45.png" onclick="openModal(this)"><div class="label">25_45</div></div>
+            <div class="image-card"><img src="visualizations/25_46.png" onclick="openModal(this)"><div class="label">25_46</div></div>
+            <div class="image-card"><img src="visualizations/25_47.png" onclick="openModal(this)"><div class="label">25_47</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-29">
+        <div class="size-header">
+            <h2>Size 29</h2>
+            <span class="count">1 model</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/29_0.png" onclick="openModal(this)"><div class="label">29_0</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-31">
+        <div class="size-header">
+            <h2>Size 31</h2>
+            <span class="count">6 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/31_0.png" onclick="openModal(this)"><div class="label">31_0</div></div>
+            <div class="image-card"><img src="visualizations/31_1.png" onclick="openModal(this)"><div class="label">31_1</div></div>
+            <div class="image-card"><img src="visualizations/31_2.png" onclick="openModal(this)"><div class="label">31_2</div></div>
+            <div class="image-card"><img src="visualizations/31_3.png" onclick="openModal(this)"><div class="label">31_3</div></div>
+            <div class="image-card"><img src="visualizations/31_4.png" onclick="openModal(this)"><div class="label">31_4</div></div>
+            <div class="image-card"><img src="visualizations/31_5.png" onclick="openModal(this)"><div class="label">31_5</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-35">
+        <div class="size-header">
+            <h2>Size 35</h2>
+            <span class="count">26 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/35_0.png" onclick="openModal(this)"><div class="label">35_0</div></div>
+            <div class="image-card"><img src="visualizations/35_1.png" onclick="openModal(this)"><div class="label">35_1</div></div>
+            <div class="image-card"><img src="visualizations/35_2.png" onclick="openModal(this)"><div class="label">35_2</div></div>
+            <div class="image-card"><img src="visualizations/35_3.png" onclick="openModal(this)"><div class="label">35_3</div></div>
+            <div class="image-card"><img src="visualizations/35_4.png" onclick="openModal(this)"><div class="label">35_4</div></div>
+            <div class="image-card"><img src="visualizations/35_5.png" onclick="openModal(this)"><div class="label">35_5</div></div>
+            <div class="image-card"><img src="visualizations/35_6.png" onclick="openModal(this)"><div class="label">35_6</div></div>
+            <div class="image-card"><img src="visualizations/35_7.png" onclick="openModal(this)"><div class="label">35_7</div></div>
+            <div class="image-card"><img src="visualizations/35_8.png" onclick="openModal(this)"><div class="label">35_8</div></div>
+            <div class="image-card"><img src="visualizations/35_9.png" onclick="openModal(this)"><div class="label">35_9</div></div>
+            <div class="image-card"><img src="visualizations/35_10.png" onclick="openModal(this)"><div class="label">35_10</div></div>
+            <div class="image-card"><img src="visualizations/35_11.png" onclick="openModal(this)"><div class="label">35_11</div></div>
+            <div class="image-card"><img src="visualizations/35_12.png" onclick="openModal(this)"><div class="label">35_12</div></div>
+            <div class="image-card"><img src="visualizations/35_13.png" onclick="openModal(this)"><div class="label">35_13</div></div>
+            <div class="image-card"><img src="visualizations/35_14.png" onclick="openModal(this)"><div class="label">35_14</div></div>
+            <div class="image-card"><img src="visualizations/35_15.png" onclick="openModal(this)"><div class="label">35_15</div></div>
+            <div class="image-card"><img src="visualizations/35_16.png" onclick="openModal(this)"><div class="label">35_16</div></div>
+            <div class="image-card"><img src="visualizations/35_17.png" onclick="openModal(this)"><div class="label">35_17</div></div>
+            <div class="image-card"><img src="visualizations/35_18.png" onclick="openModal(this)"><div class="label">35_18</div></div>
+            <div class="image-card"><img src="visualizations/35_19.png" onclick="openModal(this)"><div class="label">35_19</div></div>
+            <div class="image-card"><img src="visualizations/35_20.png" onclick="openModal(this)"><div class="label">35_20</div></div>
+            <div class="image-card"><img src="visualizations/35_21.png" onclick="openModal(this)"><div class="label">35_21</div></div>
+            <div class="image-card"><img src="visualizations/35_22.png" onclick="openModal(this)"><div class="label">35_22</div></div>
+            <div class="image-card"><img src="visualizations/35_23.png" onclick="openModal(this)"><div class="label">35_23</div></div>
+            <div class="image-card"><img src="visualizations/35_24.png" onclick="openModal(this)"><div class="label">35_24</div></div>
+            <div class="image-card"><img src="visualizations/35_25.png" onclick="openModal(this)"><div class="label">35_25</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-37">
+        <div class="size-header">
+            <h2>Size 37</h2>
+            <span class="count">2 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/37_0.png" onclick="openModal(this)"><div class="label">37_0</div></div>
+            <div class="image-card"><img src="visualizations/37_1.png" onclick="openModal(this)"><div class="label">37_1</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-41">
+        <div class="size-header">
+            <h2>Size 41</h2>
+            <span class="count">12 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/41_0.png" onclick="openModal(this)"><div class="label">41_0</div></div>
+            <div class="image-card"><img src="visualizations/41_1.png" onclick="openModal(this)"><div class="label">41_1</div></div>
+            <div class="image-card"><img src="visualizations/41_2.png" onclick="openModal(this)"><div class="label">41_2</div></div>
+            <div class="image-card"><img src="visualizations/41_3.png" onclick="openModal(this)"><div class="label">41_3</div></div>
+            <div class="image-card"><img src="visualizations/41_4.png" onclick="openModal(this)"><div class="label">41_4</div></div>
+            <div class="image-card"><img src="visualizations/41_5.png" onclick="openModal(this)"><div class="label">41_5</div></div>
+            <div class="image-card"><img src="visualizations/41_6.png" onclick="openModal(this)"><div class="label">41_6</div></div>
+            <div class="image-card"><img src="visualizations/41_7.png" onclick="openModal(this)"><div class="label">41_7</div></div>
+            <div class="image-card"><img src="visualizations/41_8.png" onclick="openModal(this)"><div class="label">41_8</div></div>
+            <div class="image-card"><img src="visualizations/41_9.png" onclick="openModal(this)"><div class="label">41_9</div></div>
+            <div class="image-card"><img src="visualizations/41_10.png" onclick="openModal(this)"><div class="label">41_10</div></div>
+            <div class="image-card"><img src="visualizations/41_11.png" onclick="openModal(this)"><div class="label">41_11</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-43">
+        <div class="size-header">
+            <h2>Size 43</h2>
+            <span class="count">4 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/43_0.png" onclick="openModal(this)"><div class="label">43_0</div></div>
+            <div class="image-card"><img src="visualizations/43_1.png" onclick="openModal(this)"><div class="label">43_1</div></div>
+            <div class="image-card"><img src="visualizations/43_2.png" onclick="openModal(this)"><div class="label">43_2</div></div>
+            <div class="image-card"><img src="visualizations/43_3.png" onclick="openModal(this)"><div class="label">43_3</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-45">
+        <div class="size-header">
+            <h2>Size 45</h2>
+            <span class="count">5 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/45_0.png" onclick="openModal(this)"><div class="label">45_0</div></div>
+            <div class="image-card"><img src="visualizations/45_1.png" onclick="openModal(this)"><div class="label">45_1</div></div>
+            <div class="image-card"><img src="visualizations/45_2.png" onclick="openModal(this)"><div class="label">45_2</div></div>
+            <div class="image-card"><img src="visualizations/45_3.png" onclick="openModal(this)"><div class="label">45_3</div></div>
+            <div class="image-card"><img src="visualizations/45_4.png" onclick="openModal(this)"><div class="label">45_4</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-49">
+        <div class="size-header">
+            <h2>Size 49</h2>
+            <span class="count">30 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/49_0.png" onclick="openModal(this)"><div class="label">49_0</div></div>
+            <div class="image-card"><img src="visualizations/49_1.png" onclick="openModal(this)"><div class="label">49_1</div></div>
+            <div class="image-card"><img src="visualizations/49_2.png" onclick="openModal(this)"><div class="label">49_2</div></div>
+            <div class="image-card"><img src="visualizations/49_3.png" onclick="openModal(this)"><div class="label">49_3</div></div>
+            <div class="image-card"><img src="visualizations/49_4.png" onclick="openModal(this)"><div class="label">49_4</div></div>
+            <div class="image-card"><img src="visualizations/49_5.png" onclick="openModal(this)"><div class="label">49_5</div></div>
+            <div class="image-card"><img src="visualizations/49_6.png" onclick="openModal(this)"><div class="label">49_6</div></div>
+            <div class="image-card"><img src="visualizations/49_7.png" onclick="openModal(this)"><div class="label">49_7</div></div>
+            <div class="image-card"><img src="visualizations/49_8.png" onclick="openModal(this)"><div class="label">49_8</div></div>
+            <div class="image-card"><img src="visualizations/49_9.png" onclick="openModal(this)"><div class="label">49_9</div></div>
+            <div class="image-card"><img src="visualizations/49_10.png" onclick="openModal(this)"><div class="label">49_10</div></div>
+            <div class="image-card"><img src="visualizations/49_11.png" onclick="openModal(this)"><div class="label">49_11</div></div>
+            <div class="image-card"><img src="visualizations/49_12.png" onclick="openModal(this)"><div class="label">49_12</div></div>
+            <div class="image-card"><img src="visualizations/49_13.png" onclick="openModal(this)"><div class="label">49_13</div></div>
+            <div class="image-card"><img src="visualizations/49_14.png" onclick="openModal(this)"><div class="label">49_14</div></div>
+            <div class="image-card"><img src="visualizations/49_15.png" onclick="openModal(this)"><div class="label">49_15</div></div>
+            <div class="image-card"><img src="visualizations/49_16.png" onclick="openModal(this)"><div class="label">49_16</div></div>
+            <div class="image-card"><img src="visualizations/49_17.png" onclick="openModal(this)"><div class="label">49_17</div></div>
+            <div class="image-card"><img src="visualizations/49_18.png" onclick="openModal(this)"><div class="label">49_18</div></div>
+            <div class="image-card"><img src="visualizations/49_19.png" onclick="openModal(this)"><div class="label">49_19</div></div>
+            <div class="image-card"><img src="visualizations/49_20.png" onclick="openModal(this)"><div class="label">49_20</div></div>
+            <div class="image-card"><img src="visualizations/49_21.png" onclick="openModal(this)"><div class="label">49_21</div></div>
+            <div class="image-card"><img src="visualizations/49_22.png" onclick="openModal(this)"><div class="label">49_22</div></div>
+            <div class="image-card"><img src="visualizations/49_23.png" onclick="openModal(this)"><div class="label">49_23</div></div>
+            <div class="image-card"><img src="visualizations/49_24.png" onclick="openModal(this)"><div class="label">49_24</div></div>
+            <div class="image-card"><img src="visualizations/49_25.png" onclick="openModal(this)"><div class="label">49_25</div></div>
+            <div class="image-card"><img src="visualizations/49_26.png" onclick="openModal(this)"><div class="label">49_26</div></div>
+            <div class="image-card"><img src="visualizations/49_27.png" onclick="openModal(this)"><div class="label">49_27</div></div>
+            <div class="image-card"><img src="visualizations/49_28.png" onclick="openModal(this)"><div class="label">49_28</div></div>
+            <div class="image-card"><img src="visualizations/49_29.png" onclick="openModal(this)"><div class="label">49_29</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-55">
+        <div class="size-header">
+            <h2>Size 55</h2>
+            <span class="count">16 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/55_0.png" onclick="openModal(this)"><div class="label">55_0</div></div>
+            <div class="image-card"><img src="visualizations/55_1.png" onclick="openModal(this)"><div class="label">55_1</div></div>
+            <div class="image-card"><img src="visualizations/55_2.png" onclick="openModal(this)"><div class="label">55_2</div></div>
+            <div class="image-card"><img src="visualizations/55_3.png" onclick="openModal(this)"><div class="label">55_3</div></div>
+            <div class="image-card"><img src="visualizations/55_4.png" onclick="openModal(this)"><div class="label">55_4</div></div>
+            <div class="image-card"><img src="visualizations/55_5.png" onclick="openModal(this)"><div class="label">55_5</div></div>
+            <div class="image-card"><img src="visualizations/55_6.png" onclick="openModal(this)"><div class="label">55_6</div></div>
+            <div class="image-card"><img src="visualizations/55_7.png" onclick="openModal(this)"><div class="label">55_7</div></div>
+            <div class="image-card"><img src="visualizations/55_8.png" onclick="openModal(this)"><div class="label">55_8</div></div>
+            <div class="image-card"><img src="visualizations/55_9.png" onclick="openModal(this)"><div class="label">55_9</div></div>
+            <div class="image-card"><img src="visualizations/55_10.png" onclick="openModal(this)"><div class="label">55_10</div></div>
+            <div class="image-card"><img src="visualizations/55_11.png" onclick="openModal(this)"><div class="label">55_11</div></div>
+            <div class="image-card"><img src="visualizations/55_12.png" onclick="openModal(this)"><div class="label">55_12</div></div>
+            <div class="image-card"><img src="visualizations/55_13.png" onclick="openModal(this)"><div class="label">55_13</div></div>
+            <div class="image-card"><img src="visualizations/55_14.png" onclick="openModal(this)"><div class="label">55_14</div></div>
+            <div class="image-card"><img src="visualizations/55_15.png" onclick="openModal(this)"><div class="label">55_15</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-61">
+        <div class="size-header">
+            <h2>Size 61</h2>
+            <span class="count">35 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/61_0.png" onclick="openModal(this)"><div class="label">61_0</div></div>
+            <div class="image-card"><img src="visualizations/61_1.png" onclick="openModal(this)"><div class="label">61_1</div></div>
+            <div class="image-card"><img src="visualizations/61_2.png" onclick="openModal(this)"><div class="label">61_2</div></div>
+            <div class="image-card"><img src="visualizations/61_3.png" onclick="openModal(this)"><div class="label">61_3</div></div>
+            <div class="image-card"><img src="visualizations/61_4.png" onclick="openModal(this)"><div class="label">61_4</div></div>
+            <div class="image-card"><img src="visualizations/61_5.png" onclick="openModal(this)"><div class="label">61_5</div></div>
+            <div class="image-card"><img src="visualizations/61_6.png" onclick="openModal(this)"><div class="label">61_6</div></div>
+            <div class="image-card"><img src="visualizations/61_7.png" onclick="openModal(this)"><div class="label">61_7</div></div>
+            <div class="image-card"><img src="visualizations/61_8.png" onclick="openModal(this)"><div class="label">61_8</div></div>
+            <div class="image-card"><img src="visualizations/61_9.png" onclick="openModal(this)"><div class="label">61_9</div></div>
+            <div class="image-card"><img src="visualizations/61_10.png" onclick="openModal(this)"><div class="label">61_10</div></div>
+            <div class="image-card"><img src="visualizations/61_11.png" onclick="openModal(this)"><div class="label">61_11</div></div>
+            <div class="image-card"><img src="visualizations/61_12.png" onclick="openModal(this)"><div class="label">61_12</div></div>
+            <div class="image-card"><img src="visualizations/61_13.png" onclick="openModal(this)"><div class="label">61_13</div></div>
+            <div class="image-card"><img src="visualizations/61_14.png" onclick="openModal(this)"><div class="label">61_14</div></div>
+            <div class="image-card"><img src="visualizations/61_15.png" onclick="openModal(this)"><div class="label">61_15</div></div>
+            <div class="image-card"><img src="visualizations/61_16.png" onclick="openModal(this)"><div class="label">61_16</div></div>
+            <div class="image-card"><img src="visualizations/61_17.png" onclick="openModal(this)"><div class="label">61_17</div></div>
+            <div class="image-card"><img src="visualizations/61_18.png" onclick="openModal(this)"><div class="label">61_18</div></div>
+            <div class="image-card"><img src="visualizations/61_19.png" onclick="openModal(this)"><div class="label">61_19</div></div>
+            <div class="image-card"><img src="visualizations/61_20.png" onclick="openModal(this)"><div class="label">61_20</div></div>
+            <div class="image-card"><img src="visualizations/61_21.png" onclick="openModal(this)"><div class="label">61_21</div></div>
+            <div class="image-card"><img src="visualizations/61_22.png" onclick="openModal(this)"><div class="label">61_22</div></div>
+            <div class="image-card"><img src="visualizations/61_23.png" onclick="openModal(this)"><div class="label">61_23</div></div>
+            <div class="image-card"><img src="visualizations/61_24.png" onclick="openModal(this)"><div class="label">61_24</div></div>
+            <div class="image-card"><img src="visualizations/61_25.png" onclick="openModal(this)"><div class="label">61_25</div></div>
+            <div class="image-card"><img src="visualizations/61_26.png" onclick="openModal(this)"><div class="label">61_26</div></div>
+            <div class="image-card"><img src="visualizations/61_27.png" onclick="openModal(this)"><div class="label">61_27</div></div>
+            <div class="image-card"><img src="visualizations/61_28.png" onclick="openModal(this)"><div class="label">61_28</div></div>
+            <div class="image-card"><img src="visualizations/61_29.png" onclick="openModal(this)"><div class="label">61_29</div></div>
+            <div class="image-card"><img src="visualizations/61_30.png" onclick="openModal(this)"><div class="label">61_30</div></div>
+            <div class="image-card"><img src="visualizations/61_31.png" onclick="openModal(this)"><div class="label">61_31</div></div>
+            <div class="image-card"><img src="visualizations/61_32.png" onclick="openModal(this)"><div class="label">61_32</div></div>
+            <div class="image-card"><img src="visualizations/61_33.png" onclick="openModal(this)"><div class="label">61_33</div></div>
+            <div class="image-card"><img src="visualizations/61_34.png" onclick="openModal(this)"><div class="label">61_34</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-63">
+        <div class="size-header">
+            <h2>Size 63</h2>
+            <span class="count">10 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/63_0.png" onclick="openModal(this)"><div class="label">63_0</div></div>
+            <div class="image-card"><img src="visualizations/63_1.png" onclick="openModal(this)"><div class="label">63_1</div></div>
+            <div class="image-card"><img src="visualizations/63_2.png" onclick="openModal(this)"><div class="label">63_2</div></div>
+            <div class="image-card"><img src="visualizations/63_3.png" onclick="openModal(this)"><div class="label">63_3</div></div>
+            <div class="image-card"><img src="visualizations/63_4.png" onclick="openModal(this)"><div class="label">63_4</div></div>
+            <div class="image-card"><img src="visualizations/63_5.png" onclick="openModal(this)"><div class="label">63_5</div></div>
+            <div class="image-card"><img src="visualizations/63_6.png" onclick="openModal(this)"><div class="label">63_6</div></div>
+            <div class="image-card"><img src="visualizations/63_7.png" onclick="openModal(this)"><div class="label">63_7</div></div>
+            <div class="image-card"><img src="visualizations/63_8.png" onclick="openModal(this)"><div class="label">63_8</div></div>
+            <div class="image-card"><img src="visualizations/63_9.png" onclick="openModal(this)"><div class="label">63_9</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-65">
+        <div class="size-header">
+            <h2>Size 65</h2>
+            <span class="count">17 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/65_0.png" onclick="openModal(this)"><div class="label">65_0</div></div>
+            <div class="image-card"><img src="visualizations/65_1.png" onclick="openModal(this)"><div class="label">65_1</div></div>
+            <div class="image-card"><img src="visualizations/65_2.png" onclick="openModal(this)"><div class="label">65_2</div></div>
+            <div class="image-card"><img src="visualizations/65_3.png" onclick="openModal(this)"><div class="label">65_3</div></div>
+            <div class="image-card"><img src="visualizations/65_4.png" onclick="openModal(this)"><div class="label">65_4</div></div>
+            <div class="image-card"><img src="visualizations/65_5.png" onclick="openModal(this)"><div class="label">65_5</div></div>
+            <div class="image-card"><img src="visualizations/65_6.png" onclick="openModal(this)"><div class="label">65_6</div></div>
+            <div class="image-card"><img src="visualizations/65_7.png" onclick="openModal(this)"><div class="label">65_7</div></div>
+            <div class="image-card"><img src="visualizations/65_8.png" onclick="openModal(this)"><div class="label">65_8</div></div>
+            <div class="image-card"><img src="visualizations/65_9.png" onclick="openModal(this)"><div class="label">65_9</div></div>
+            <div class="image-card"><img src="visualizations/65_10.png" onclick="openModal(this)"><div class="label">65_10</div></div>
+            <div class="image-card"><img src="visualizations/65_11.png" onclick="openModal(this)"><div class="label">65_11</div></div>
+            <div class="image-card"><img src="visualizations/65_12.png" onclick="openModal(this)"><div class="label">65_12</div></div>
+            <div class="image-card"><img src="visualizations/65_13.png" onclick="openModal(this)"><div class="label">65_13</div></div>
+            <div class="image-card"><img src="visualizations/65_14.png" onclick="openModal(this)"><div class="label">65_14</div></div>
+            <div class="image-card"><img src="visualizations/65_15.png" onclick="openModal(this)"><div class="label">65_15</div></div>
+            <div class="image-card"><img src="visualizations/65_16.png" onclick="openModal(this)"><div class="label">65_16</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-67">
+        <div class="size-header">
+            <h2>Size 67</h2>
+            <span class="count">2 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/67_0.png" onclick="openModal(this)"><div class="label">67_0</div></div>
+            <div class="image-card"><img src="visualizations/67_1.png" onclick="openModal(this)"><div class="label">67_1</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-71">
+        <div class="size-header">
+            <h2>Size 71</h2>
+            <span class="count">4 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/71_0.png" onclick="openModal(this)"><div class="label">71_0</div></div>
+            <div class="image-card"><img src="visualizations/71_1.png" onclick="openModal(this)"><div class="label">71_1</div></div>
+            <div class="image-card"><img src="visualizations/71_2.png" onclick="openModal(this)"><div class="label">71_2</div></div>
+            <div class="image-card"><img src="visualizations/71_3.png" onclick="openModal(this)"><div class="label">71_3</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-73">
+        <div class="size-header">
+            <h2>Size 73</h2>
+            <span class="count">2 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/73_0.png" onclick="openModal(this)"><div class="label">73_0</div></div>
+            <div class="image-card"><img src="visualizations/73_1.png" onclick="openModal(this)"><div class="label">73_1</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-77">
+        <div class="size-header">
+            <h2>Size 77</h2>
+            <span class="count">87 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/77_0.png" onclick="openModal(this)"><div class="label">77_0</div></div>
+            <div class="image-card"><img src="visualizations/77_1.png" onclick="openModal(this)"><div class="label">77_1</div></div>
+            <div class="image-card"><img src="visualizations/77_2.png" onclick="openModal(this)"><div class="label">77_2</div></div>
+            <div class="image-card"><img src="visualizations/77_3.png" onclick="openModal(this)"><div class="label">77_3</div></div>
+            <div class="image-card"><img src="visualizations/77_4.png" onclick="openModal(this)"><div class="label">77_4</div></div>
+            <div class="image-card"><img src="visualizations/77_5.png" onclick="openModal(this)"><div class="label">77_5</div></div>
+            <div class="image-card"><img src="visualizations/77_6.png" onclick="openModal(this)"><div class="label">77_6</div></div>
+            <div class="image-card"><img src="visualizations/77_7.png" onclick="openModal(this)"><div class="label">77_7</div></div>
+            <div class="image-card"><img src="visualizations/77_8.png" onclick="openModal(this)"><div class="label">77_8</div></div>
+            <div class="image-card"><img src="visualizations/77_9.png" onclick="openModal(this)"><div class="label">77_9</div></div>
+            <div class="image-card"><img src="visualizations/77_10.png" onclick="openModal(this)"><div class="label">77_10</div></div>
+            <div class="image-card"><img src="visualizations/77_11.png" onclick="openModal(this)"><div class="label">77_11</div></div>
+            <div class="image-card"><img src="visualizations/77_12.png" onclick="openModal(this)"><div class="label">77_12</div></div>
+            <div class="image-card"><img src="visualizations/77_13.png" onclick="openModal(this)"><div class="label">77_13</div></div>
+            <div class="image-card"><img src="visualizations/77_14.png" onclick="openModal(this)"><div class="label">77_14</div></div>
+            <div class="image-card"><img src="visualizations/77_15.png" onclick="openModal(this)"><div class="label">77_15</div></div>
+            <div class="image-card"><img src="visualizations/77_16.png" onclick="openModal(this)"><div class="label">77_16</div></div>
+            <div class="image-card"><img src="visualizations/77_17.png" onclick="openModal(this)"><div class="label">77_17</div></div>
+            <div class="image-card"><img src="visualizations/77_18.png" onclick="openModal(this)"><div class="label">77_18</div></div>
+            <div class="image-card"><img src="visualizations/77_19.png" onclick="openModal(this)"><div class="label">77_19</div></div>
+            <div class="image-card"><img src="visualizations/77_20.png" onclick="openModal(this)"><div class="label">77_20</div></div>
+            <div class="image-card"><img src="visualizations/77_21.png" onclick="openModal(this)"><div class="label">77_21</div></div>
+            <div class="image-card"><img src="visualizations/77_22.png" onclick="openModal(this)"><div class="label">77_22</div></div>
+            <div class="image-card"><img src="visualizations/77_23.png" onclick="openModal(this)"><div class="label">77_23</div></div>
+            <div class="image-card"><img src="visualizations/77_24.png" onclick="openModal(this)"><div class="label">77_24</div></div>
+            <div class="image-card"><img src="visualizations/77_25.png" onclick="openModal(this)"><div class="label">77_25</div></div>
+            <div class="image-card"><img src="visualizations/77_26.png" onclick="openModal(this)"><div class="label">77_26</div></div>
+            <div class="image-card"><img src="visualizations/77_27.png" onclick="openModal(this)"><div class="label">77_27</div></div>
+            <div class="image-card"><img src="visualizations/77_28.png" onclick="openModal(this)"><div class="label">77_28</div></div>
+            <div class="image-card"><img src="visualizations/77_29.png" onclick="openModal(this)"><div class="label">77_29</div></div>
+            <div class="image-card"><img src="visualizations/77_30.png" onclick="openModal(this)"><div class="label">77_30</div></div>
+            <div class="image-card"><img src="visualizations/77_31.png" onclick="openModal(this)"><div class="label">77_31</div></div>
+            <div class="image-card"><img src="visualizations/77_32.png" onclick="openModal(this)"><div class="label">77_32</div></div>
+            <div class="image-card"><img src="visualizations/77_33.png" onclick="openModal(this)"><div class="label">77_33</div></div>
+            <div class="image-card"><img src="visualizations/77_34.png" onclick="openModal(this)"><div class="label">77_34</div></div>
+            <div class="image-card"><img src="visualizations/77_35.png" onclick="openModal(this)"><div class="label">77_35</div></div>
+            <div class="image-card"><img src="visualizations/77_36.png" onclick="openModal(this)"><div class="label">77_36</div></div>
+            <div class="image-card"><img src="visualizations/77_37.png" onclick="openModal(this)"><div class="label">77_37</div></div>
+            <div class="image-card"><img src="visualizations/77_38.png" onclick="openModal(this)"><div class="label">77_38</div></div>
+            <div class="image-card"><img src="visualizations/77_39.png" onclick="openModal(this)"><div class="label">77_39</div></div>
+            <div class="image-card"><img src="visualizations/77_40.png" onclick="openModal(this)"><div class="label">77_40</div></div>
+            <div class="image-card"><img src="visualizations/77_41.png" onclick="openModal(this)"><div class="label">77_41</div></div>
+            <div class="image-card"><img src="visualizations/77_42.png" onclick="openModal(this)"><div class="label">77_42</div></div>
+            <div class="image-card"><img src="visualizations/77_43.png" onclick="openModal(this)"><div class="label">77_43</div></div>
+            <div class="image-card"><img src="visualizations/77_44.png" onclick="openModal(this)"><div class="label">77_44</div></div>
+            <div class="image-card"><img src="visualizations/77_45.png" onclick="openModal(this)"><div class="label">77_45</div></div>
+            <div class="image-card"><img src="visualizations/77_46.png" onclick="openModal(this)"><div class="label">77_46</div></div>
+            <div class="image-card"><img src="visualizations/77_47.png" onclick="openModal(this)"><div class="label">77_47</div></div>
+            <div class="image-card"><img src="visualizations/77_48.png" onclick="openModal(this)"><div class="label">77_48</div></div>
+            <div class="image-card"><img src="visualizations/77_49.png" onclick="openModal(this)"><div class="label">77_49</div></div>
+            <div class="image-card"><img src="visualizations/77_50.png" onclick="openModal(this)"><div class="label">77_50</div></div>
+            <div class="image-card"><img src="visualizations/77_51.png" onclick="openModal(this)"><div class="label">77_51</div></div>
+            <div class="image-card"><img src="visualizations/77_52.png" onclick="openModal(this)"><div class="label">77_52</div></div>
+            <div class="image-card"><img src="visualizations/77_53.png" onclick="openModal(this)"><div class="label">77_53</div></div>
+            <div class="image-card"><img src="visualizations/77_54.png" onclick="openModal(this)"><div class="label">77_54</div></div>
+            <div class="image-card"><img src="visualizations/77_55.png" onclick="openModal(this)"><div class="label">77_55</div></div>
+            <div class="image-card"><img src="visualizations/77_56.png" onclick="openModal(this)"><div class="label">77_56</div></div>
+            <div class="image-card"><img src="visualizations/77_57.png" onclick="openModal(this)"><div class="label">77_57</div></div>
+            <div class="image-card"><img src="visualizations/77_58.png" onclick="openModal(this)"><div class="label">77_58</div></div>
+            <div class="image-card"><img src="visualizations/77_59.png" onclick="openModal(this)"><div class="label">77_59</div></div>
+            <div class="image-card"><img src="visualizations/77_60.png" onclick="openModal(this)"><div class="label">77_60</div></div>
+            <div class="image-card"><img src="visualizations/77_61.png" onclick="openModal(this)"><div class="label">77_61</div></div>
+            <div class="image-card"><img src="visualizations/77_62.png" onclick="openModal(this)"><div class="label">77_62</div></div>
+            <div class="image-card"><img src="visualizations/77_63.png" onclick="openModal(this)"><div class="label">77_63</div></div>
+            <div class="image-card"><img src="visualizations/77_64.png" onclick="openModal(this)"><div class="label">77_64</div></div>
+            <div class="image-card"><img src="visualizations/77_65.png" onclick="openModal(this)"><div class="label">77_65</div></div>
+            <div class="image-card"><img src="visualizations/77_66.png" onclick="openModal(this)"><div class="label">77_66</div></div>
+            <div class="image-card"><img src="visualizations/77_67.png" onclick="openModal(this)"><div class="label">77_67</div></div>
+            <div class="image-card"><img src="visualizations/77_68.png" onclick="openModal(this)"><div class="label">77_68</div></div>
+            <div class="image-card"><img src="visualizations/77_69.png" onclick="openModal(this)"><div class="label">77_69</div></div>
+            <div class="image-card"><img src="visualizations/77_70.png" onclick="openModal(this)"><div class="label">77_70</div></div>
+            <div class="image-card"><img src="visualizations/77_71.png" onclick="openModal(this)"><div class="label">77_71</div></div>
+            <div class="image-card"><img src="visualizations/77_72.png" onclick="openModal(this)"><div class="label">77_72</div></div>
+            <div class="image-card"><img src="visualizations/77_73.png" onclick="openModal(this)"><div class="label">77_73</div></div>
+            <div class="image-card"><img src="visualizations/77_74.png" onclick="openModal(this)"><div class="label">77_74</div></div>
+            <div class="image-card"><img src="visualizations/77_75.png" onclick="openModal(this)"><div class="label">77_75</div></div>
+            <div class="image-card"><img src="visualizations/77_76.png" onclick="openModal(this)"><div class="label">77_76</div></div>
+            <div class="image-card"><img src="visualizations/77_77.png" onclick="openModal(this)"><div class="label">77_77</div></div>
+            <div class="image-card"><img src="visualizations/77_78.png" onclick="openModal(this)"><div class="label">77_78</div></div>
+            <div class="image-card"><img src="visualizations/77_79.png" onclick="openModal(this)"><div class="label">77_79</div></div>
+            <div class="image-card"><img src="visualizations/77_80.png" onclick="openModal(this)"><div class="label">77_80</div></div>
+            <div class="image-card"><img src="visualizations/77_81.png" onclick="openModal(this)"><div class="label">77_81</div></div>
+            <div class="image-card"><img src="visualizations/77_82.png" onclick="openModal(this)"><div class="label">77_82</div></div>
+            <div class="image-card"><img src="visualizations/77_83.png" onclick="openModal(this)"><div class="label">77_83</div></div>
+            <div class="image-card"><img src="visualizations/77_84.png" onclick="openModal(this)"><div class="label">77_84</div></div>
+            <div class="image-card"><img src="visualizations/77_85.png" onclick="openModal(this)"><div class="label">77_85</div></div>
+            <div class="image-card"><img src="visualizations/77_86.png" onclick="openModal(this)"><div class="label">77_86</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-80">
+        <div class="size-header">
+            <h2>Size 80</h2>
+            <span class="count">4 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/80_0.png" onclick="openModal(this)"><div class="label">80_0</div></div>
+            <div class="image-card"><img src="visualizations/80_1.png" onclick="openModal(this)"><div class="label">80_1</div></div>
+            <div class="image-card"><img src="visualizations/80_2.png" onclick="openModal(this)"><div class="label">80_2</div></div>
+            <div class="image-card"><img src="visualizations/80_3.png" onclick="openModal(this)"><div class="label">80_3</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-81">
+        <div class="size-header">
+            <h2>Size 81</h2>
+            <span class="count">21 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/81_0.png" onclick="openModal(this)"><div class="label">81_0</div></div>
+            <div class="image-card"><img src="visualizations/81_1.png" onclick="openModal(this)"><div class="label">81_1</div></div>
+            <div class="image-card"><img src="visualizations/81_2.png" onclick="openModal(this)"><div class="label">81_2</div></div>
+            <div class="image-card"><img src="visualizations/81_3.png" onclick="openModal(this)"><div class="label">81_3</div></div>
+            <div class="image-card"><img src="visualizations/81_4.png" onclick="openModal(this)"><div class="label">81_4</div></div>
+            <div class="image-card"><img src="visualizations/81_5.png" onclick="openModal(this)"><div class="label">81_5</div></div>
+            <div class="image-card"><img src="visualizations/81_6.png" onclick="openModal(this)"><div class="label">81_6</div></div>
+            <div class="image-card"><img src="visualizations/81_7.png" onclick="openModal(this)"><div class="label">81_7</div></div>
+            <div class="image-card"><img src="visualizations/81_8.png" onclick="openModal(this)"><div class="label">81_8</div></div>
+            <div class="image-card"><img src="visualizations/81_9.png" onclick="openModal(this)"><div class="label">81_9</div></div>
+            <div class="image-card"><img src="visualizations/81_10.png" onclick="openModal(this)"><div class="label">81_10</div></div>
+            <div class="image-card"><img src="visualizations/81_11.png" onclick="openModal(this)"><div class="label">81_11</div></div>
+            <div class="image-card"><img src="visualizations/81_12.png" onclick="openModal(this)"><div class="label">81_12</div></div>
+            <div class="image-card"><img src="visualizations/81_13.png" onclick="openModal(this)"><div class="label">81_13</div></div>
+            <div class="image-card"><img src="visualizations/81_14.png" onclick="openModal(this)"><div class="label">81_14</div></div>
+            <div class="image-card"><img src="visualizations/81_15.png" onclick="openModal(this)"><div class="label">81_15</div></div>
+            <div class="image-card"><img src="visualizations/81_16.png" onclick="openModal(this)"><div class="label">81_16</div></div>
+            <div class="image-card"><img src="visualizations/81_17.png" onclick="openModal(this)"><div class="label">81_17</div></div>
+            <div class="image-card"><img src="visualizations/81_18.png" onclick="openModal(this)"><div class="label">81_18</div></div>
+            <div class="image-card"><img src="visualizations/81_19.png" onclick="openModal(this)"><div class="label">81_19</div></div>
+            <div class="image-card"><img src="visualizations/81_20.png" onclick="openModal(this)"><div class="label">81_20</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-83">
+        <div class="size-header">
+            <h2>Size 83</h2>
+            <span class="count">1 model</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/83_0.png" onclick="openModal(this)"><div class="label">83_0</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-85">
+        <div class="size-header">
+            <h2>Size 85</h2>
+            <span class="count">7 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/85_0.png" onclick="openModal(this)"><div class="label">85_0</div></div>
+            <div class="image-card"><img src="visualizations/85_1.png" onclick="openModal(this)"><div class="label">85_1</div></div>
+            <div class="image-card"><img src="visualizations/85_2.png" onclick="openModal(this)"><div class="label">85_2</div></div>
+            <div class="image-card"><img src="visualizations/85_3.png" onclick="openModal(this)"><div class="label">85_3</div></div>
+            <div class="image-card"><img src="visualizations/85_4.png" onclick="openModal(this)"><div class="label">85_4</div></div>
+            <div class="image-card"><img src="visualizations/85_5.png" onclick="openModal(this)"><div class="label">85_5</div></div>
+            <div class="image-card"><img src="visualizations/85_6.png" onclick="openModal(this)"><div class="label">85_6</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-89">
+        <div class="size-header">
+            <h2>Size 89</h2>
+            <span class="count">1 model</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/89_0.png" onclick="openModal(this)"><div class="label">89_0</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-91">
+        <div class="size-header">
+            <h2>Size 91</h2>
+            <span class="count">10 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/91_0.png" onclick="openModal(this)"><div class="label">91_0</div></div>
+            <div class="image-card"><img src="visualizations/91_1.png" onclick="openModal(this)"><div class="label">91_1</div></div>
+            <div class="image-card"><img src="visualizations/91_2.png" onclick="openModal(this)"><div class="label">91_2</div></div>
+            <div class="image-card"><img src="visualizations/91_3.png" onclick="openModal(this)"><div class="label">91_3</div></div>
+            <div class="image-card"><img src="visualizations/91_4.png" onclick="openModal(this)"><div class="label">91_4</div></div>
+            <div class="image-card"><img src="visualizations/91_5.png" onclick="openModal(this)"><div class="label">91_5</div></div>
+            <div class="image-card"><img src="visualizations/91_6.png" onclick="openModal(this)"><div class="label">91_6</div></div>
+            <div class="image-card"><img src="visualizations/91_7.png" onclick="openModal(this)"><div class="label">91_7</div></div>
+            <div class="image-card"><img src="visualizations/91_8.png" onclick="openModal(this)"><div class="label">91_8</div></div>
+            <div class="image-card"><img src="visualizations/91_9.png" onclick="openModal(this)"><div class="label">91_9</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-95">
+        <div class="size-header">
+            <h2>Size 95</h2>
+            <span class="count">6 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/95_0.png" onclick="openModal(this)"><div class="label">95_0</div></div>
+            <div class="image-card"><img src="visualizations/95_1.png" onclick="openModal(this)"><div class="label">95_1</div></div>
+            <div class="image-card"><img src="visualizations/95_2.png" onclick="openModal(this)"><div class="label">95_2</div></div>
+            <div class="image-card"><img src="visualizations/95_3.png" onclick="openModal(this)"><div class="label">95_3</div></div>
+            <div class="image-card"><img src="visualizations/95_4.png" onclick="openModal(this)"><div class="label">95_4</div></div>
+            <div class="image-card"><img src="visualizations/95_5.png" onclick="openModal(this)"><div class="label">95_5</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-97">
+        <div class="size-header">
+            <h2>Size 97</h2>
+            <span class="count">2 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/97_0.png" onclick="openModal(this)"><div class="label">97_0</div></div>
+            <div class="image-card"><img src="visualizations/97_1.png" onclick="openModal(this)"><div class="label">97_1</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-99">
+        <div class="size-header">
+            <h2>Size 99</h2>
+            <span class="count">46 models</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/99_0.png" onclick="openModal(this)"><div class="label">99_0</div></div>
+            <div class="image-card"><img src="visualizations/99_1.png" onclick="openModal(this)"><div class="label">99_1</div></div>
+            <div class="image-card"><img src="visualizations/99_2.png" onclick="openModal(this)"><div class="label">99_2</div></div>
+            <div class="image-card"><img src="visualizations/99_3.png" onclick="openModal(this)"><div class="label">99_3</div></div>
+            <div class="image-card"><img src="visualizations/99_4.png" onclick="openModal(this)"><div class="label">99_4</div></div>
+            <div class="image-card"><img src="visualizations/99_5.png" onclick="openModal(this)"><div class="label">99_5</div></div>
+            <div class="image-card"><img src="visualizations/99_6.png" onclick="openModal(this)"><div class="label">99_6</div></div>
+            <div class="image-card"><img src="visualizations/99_7.png" onclick="openModal(this)"><div class="label">99_7</div></div>
+            <div class="image-card"><img src="visualizations/99_8.png" onclick="openModal(this)"><div class="label">99_8</div></div>
+            <div class="image-card"><img src="visualizations/99_9.png" onclick="openModal(this)"><div class="label">99_9</div></div>
+            <div class="image-card"><img src="visualizations/99_10.png" onclick="openModal(this)"><div class="label">99_10</div></div>
+            <div class="image-card"><img src="visualizations/99_11.png" onclick="openModal(this)"><div class="label">99_11</div></div>
+            <div class="image-card"><img src="visualizations/99_12.png" onclick="openModal(this)"><div class="label">99_12</div></div>
+            <div class="image-card"><img src="visualizations/99_13.png" onclick="openModal(this)"><div class="label">99_13</div></div>
+            <div class="image-card"><img src="visualizations/99_14.png" onclick="openModal(this)"><div class="label">99_14</div></div>
+            <div class="image-card"><img src="visualizations/99_15.png" onclick="openModal(this)"><div class="label">99_15</div></div>
+            <div class="image-card"><img src="visualizations/99_16.png" onclick="openModal(this)"><div class="label">99_16</div></div>
+            <div class="image-card"><img src="visualizations/99_17.png" onclick="openModal(this)"><div class="label">99_17</div></div>
+            <div class="image-card"><img src="visualizations/99_18.png" onclick="openModal(this)"><div class="label">99_18</div></div>
+            <div class="image-card"><img src="visualizations/99_19.png" onclick="openModal(this)"><div class="label">99_19</div></div>
+            <div class="image-card"><img src="visualizations/99_20.png" onclick="openModal(this)"><div class="label">99_20</div></div>
+            <div class="image-card"><img src="visualizations/99_21.png" onclick="openModal(this)"><div class="label">99_21</div></div>
+            <div class="image-card"><img src="visualizations/99_22.png" onclick="openModal(this)"><div class="label">99_22</div></div>
+            <div class="image-card"><img src="visualizations/99_23.png" onclick="openModal(this)"><div class="label">99_23</div></div>
+            <div class="image-card"><img src="visualizations/99_24.png" onclick="openModal(this)"><div class="label">99_24</div></div>
+            <div class="image-card"><img src="visualizations/99_25.png" onclick="openModal(this)"><div class="label">99_25</div></div>
+            <div class="image-card"><img src="visualizations/99_26.png" onclick="openModal(this)"><div class="label">99_26</div></div>
+            <div class="image-card"><img src="visualizations/99_27.png" onclick="openModal(this)"><div class="label">99_27</div></div>
+            <div class="image-card"><img src="visualizations/99_28.png" onclick="openModal(this)"><div class="label">99_28</div></div>
+            <div class="image-card"><img src="visualizations/99_29.png" onclick="openModal(this)"><div class="label">99_29</div></div>
+            <div class="image-card"><img src="visualizations/99_30.png" onclick="openModal(this)"><div class="label">99_30</div></div>
+            <div class="image-card"><img src="visualizations/99_31.png" onclick="openModal(this)"><div class="label">99_31</div></div>
+            <div class="image-card"><img src="visualizations/99_32.png" onclick="openModal(this)"><div class="label">99_32</div></div>
+            <div class="image-card"><img src="visualizations/99_33.png" onclick="openModal(this)"><div class="label">99_33</div></div>
+            <div class="image-card"><img src="visualizations/99_34.png" onclick="openModal(this)"><div class="label">99_34</div></div>
+            <div class="image-card"><img src="visualizations/99_35.png" onclick="openModal(this)"><div class="label">99_35</div></div>
+            <div class="image-card"><img src="visualizations/99_36.png" onclick="openModal(this)"><div class="label">99_36</div></div>
+            <div class="image-card"><img src="visualizations/99_37.png" onclick="openModal(this)"><div class="label">99_37</div></div>
+            <div class="image-card"><img src="visualizations/99_38.png" onclick="openModal(this)"><div class="label">99_38</div></div>
+            <div class="image-card"><img src="visualizations/99_39.png" onclick="openModal(this)"><div class="label">99_39</div></div>
+            <div class="image-card"><img src="visualizations/99_40.png" onclick="openModal(this)"><div class="label">99_40</div></div>
+            <div class="image-card"><img src="visualizations/99_41.png" onclick="openModal(this)"><div class="label">99_41</div></div>
+            <div class="image-card"><img src="visualizations/99_42.png" onclick="openModal(this)"><div class="label">99_42</div></div>
+            <div class="image-card"><img src="visualizations/99_43.png" onclick="openModal(this)"><div class="label">99_43</div></div>
+            <div class="image-card"><img src="visualizations/99_44.png" onclick="openModal(this)"><div class="label">99_44</div></div>
+            <div class="image-card"><img src="visualizations/99_45.png" onclick="openModal(this)"><div class="label">99_45</div></div>
+        </div>
+    </section>
+
+    <section class="size-section" id="size-496">
+        <div class="size-header">
+            <h2>Size 496</h2>
+            <span class="count">1 model</span>
+            <a href="#top" class="back-to-top">Back to top</a>
+        </div>
+        <div class="image-grid">
+            <div class="image-card"><img src="visualizations/496_0.png" onclick="openModal(this)"><div class="label">496_0</div></div>
+        </div>
+    </section>
+
+    <div class="modal" id="modal" onclick="closeModal()">
+        <span class="modal-close">&times;</span>
+        <img id="modal-img" src="" alt="Enlarged view">
+    </div>
+
+    <script>
+        function openModal(img) {
+            document.getElementById('modal-img').src = img.src;
+            document.getElementById('modal').classList.add('active');
+        }
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
